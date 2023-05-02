@@ -5,31 +5,46 @@ const flights =
   '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
 // Data needed for first part of the section
+
+const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+const openingHours = {
+  [weekdays[3]]: {
+    open: 12,
+    close: 22,
+  },
+  [weekdays[4]]: {
+    open: 11,
+    close: 23,
+  },
+  [weekdays[5]]: {
+    open: 0, // Open 24 hours
+    close: 24,
+  },
+};
+
 const restaurant = {
   name: 'Classico Italiano',
   location: 'Via Angelo Tavanti 23, Firenze, Italy',
   categories: ['Italian', 'Pizzeria', 'Vegetarian', 'Organic'],
   starterMenu: ['Focaccia', 'Bruschetta', 'Garlic Bread', 'Caprese Salad'],
   mainMenu: ['Pizza', 'Pasta', 'Risotto'],
+  //========================================
+  //ES6 Enhanced Object Literals
+  //========================================
+  openingHours,
 
-  openingHours: {
-    thu: {
-      open: 12,
-      close: 22,
-    },
-    fri: {
-      open: 11,
-      close: 23,
-    },
-    sat: {
-      open: 0, // Open 24 hours
-      close: 24,
-    },
-  },
+  //with ES6, I can shorten the syntax down even further to make it look even neater!
+  //So instead of the code below...
 
   order: function (starterIndex, mainIndex) {
     return [this.starterMenu[starterIndex], this.mainMenu[mainIndex]];
   },
+
+  //I can do this instead:
+  // order(starterIndex, mainIndex) {
+  //   return [this.starterMenu[starterIndex], this.mainMenu[mainIndex]];
+  // },
 
   //Here I create a function and pass it an object, called "obj", as an argument
 
@@ -64,6 +79,54 @@ const restaurant = {
     console.log(mainIngreds, otherIngreds);
   },
 };
+
+if (restaurant.openingHours && restaurant.openingHours.mon)
+  console.log(restaurant.openingHours.mon.open);
+
+//WITH OPTIONAL CHAINING:
+//Using the question mark before a property is known as "Optional Chaining"
+//Using optional chaining, if the property doesn't exist, instead of returning NOTHING, or an ERROR, it will immediately return "undefined"
+//So here my code is checking if the "mon" property exists
+console.log(restaurant.openingHours.mon?.open);
+//And here my code checks whether the openingHours property exists
+console.log(restaurant.openingHours?.mon?.open);
+
+//=========================================
+//Real world example of Optional Chaining
+//=========================================
+
+const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+for (const day of days) {
+  // console.log(day);
+  //If I want to use a vriable name as the property name, I need to wrap it in square brackets []
+  //Because on saturday we open at "0", and 0 is a FALSEY value, I need to use the Nullish operator, INSTEAD OF THE OR ||, so that my code will return the value of 0, as the Nullish operator looks for the first FALSEY value
+  const open = restaurant.openingHours[day]?.open ?? 'closed';
+  console.log(`On ${day} we open at ${open}`);
+}
+//=========================================
+//Optional Chaining Methods
+//=========================================
+//Here I use optional chaining to check if my method exists before even attempting to call it
+//I also use the Nullish operator to ensure it checks for the method existence, as the Nullish oeprator will be looking for the first FALSEY value to execute
+console.log(restaurant.order?.(0, 1) ?? 'Method does not exist!');
+
+//Since orderRisotto method doesn't exist, the Nullish operator automatically returns undefined, or in this case my string
+console.log(restaurant.orderRisotto?.(0, 1) ?? 'Method does not exist!');
+
+//=========================================
+//Optional Chaining Arrays
+//=========================================
+const users = [{ name: 'Pat', email: 'hello@pat.com' }];
+
+//Here I use optional chaining to check if the users object at index position 0 exists at all, and the nullish operator again to ensure redundancy in that it will print out my string if it's not present
+console.log(users[0]?.name ?? 'User array empty!');
+
+//Without usiong optional chaining, I'd have to code out an entire if/else block to ensure the parameters for existence are being met
+if (users.length > 0) console.log(users[0]?.name);
+else console.log('User array empty!');
+
+//=====================================================
 
 //Then, here I call that function, and pass it an object of functions
 //THIS IS ONE OBJECT
@@ -166,8 +229,8 @@ console.log(pizza, risotto, otherFood);
 //Using the REST pattern with objects
 
 //Because we use the rest pattern TO THE LEFT (to tha left) of the assignment operator in our destructuring assignment, my new object will read the value of sat, THEN take and assign the values of fri & thurs to my weekdays object
-const { sat, ...weekdays } = restaurant.openingHours;
-console.log(weekdays);
+// const { sat, ...weekdays } = restaurant.openingHours;
+// console.log(weekdays);
 
 // 2) Functions
 
@@ -193,8 +256,8 @@ restaurant.orderPizza('bacon', 'ham', 'cheese');
 //Like destructuring arrays, we use curly braces {} to destructure objects
 //So I've created 3 brand new variables, name, openingHours, and categories, and have told them to be equal to my restaurant object
 //Name is "deprecated"??
-const { name, openingHours, categories } = restaurant;
-console.log(name, openingHours, categories);
+// const { name, openingHours, categories } = restaurant;
+// console.log(name, openingHours, categories);
 
 //What if I want the variable naems to be different from the property names??
 //Then I essentially do the exact same thing, but I reassign the names of each object using ":", as if I'm creating new objects themselves
@@ -383,6 +446,188 @@ console.log(rest1, rest2);
 //CHALLENGE
 //=====================================================
 
+// const game = {
+//   team1: 'Bayern Munich',
+//   team2: 'Borussia Dortmund',
+//   players: [
+//     [
+//       'Neuer',
+//       'Pavard',
+//       'Martinez',
+//       'Alaba',
+//       'Davies',
+//       'Kimmich',
+//       'Goretzka',
+//       'Coman',
+//       'Muller',
+//       'Gnarby',
+//       'Lewandowski',
+//     ],
+//     [
+//       'Burki',
+//       'Schulz',
+//       'Hummels',
+//       'Akanji',
+//       'Hakimi',
+//       'Weigl',
+//       'Witsel',
+//       'Hazard',
+//       'Brandt',
+//       'Sancho',
+//       'Gotze',
+//     ],
+//   ],
+//   score: '4:0',
+//   scored: ['Lewandowski', 'Gnarby', 'Lewandowski', 'Hummels'],
+//   date: 'Nov 9th, 2037',
+//   odds: {
+//     team1: 1.33,
+//     x: 3.25,
+//     team2: 6.5,
+//   },
+// };
+
+// //1. Create one player array for each team (variables 'players1', and 'players2')
+
+// const players1 = [game.players[0]];
+// const players2 = [game.players[1]];
+// console.log(
+//   '1. Array containing all the players for each respective team',
+//   players1,
+//   players2
+// );
+// //TEACHER'S SOLUTION:
+// // const [players1, players2] = game.players;
+// // console.log(players1, players2);
+
+// //2. The first player in any player array is the goalkeeper and the others are field players. For Bayern Munich (team1) create one variable ('gk') with the goalkeeper's name, and one array ('fieldPlayers') with all the remaining 10 field players
+
+// const gk = [game.team1, ...players1];
+// console.log(
+//   '2. Array named gk containing Bayern as the goalkeeper and his players',
+//   gk
+// );
+// //TEACHER'S SOLUTION:
+// // const [gk, ...fieldPlayers] = players1;
+
+// //3. Create an array 'allPlayers', containing all players of both teams (22 players)
+
+// const allPlayers = [...players1, ...players2];
+// console.log('3. Array containing all Players', allPlayers);
+// //I got the code, and the syntax, correct, BUT because I fucked up the first two questions, it ends up fucking up this question, too, and I end up with 2 seperate arrays of 1 each....
+
+// //4. During the game, Bayern Munich (team 1) used 3 substitute players. So create a new array ('playersFinal') containing all the original team 1 players, plus 'Thiago', 'Coutinho', and 'Perisic'
+
+// const playersFinal = [...players1, 'Thiago', 'Coutinho', 'Perisic'];
+// console.log(
+//   "4. New array containing all of team 1's players + the new ones",
+//   playersFinal
+// );
+// //THIS is the only one you got right, you dickhead
+
+// //5. Based on the game.odds object, create one variable for each odd (called 'team1', draw, and 'team2')
+
+// const {
+//   odds: { team1, x: draw, team2 },
+// } = game;
+// console.log('5. New variable names destructured', team1, draw, team2);
+// //YOU GOT THIS ONE RIGHT AS WELL; MIRACLE
+
+// //6. Write a function ('printGoals') that receives an arbitrary number of player names (NOT AN ARRAY) and prints each of them to the console, along with the number of goals that were scored (number of player names passed in)
+// //TEST DATA FOR 6:
+// //'Davies', 'Muller', 'Lewandowski', 'Kimmich'
+
+// function printGoals(...playerNames) {
+//   console.log(`${playerNames.length} goals scored`);
+//   for (let i = 0; i < playerNames.length; i++) {
+//     console.log(playerNames[i]);
+//   }
+// }
+// console.log(
+//   '6. Function that prints out the names of the 4 goal scorers and informs how many total goals were scored'
+// );
+// printGoals('Davies', 'Muller', 'Lewandowski', 'Kimmich');
+// //You got your code right, but you didn't call the function correctly (like usual...)
+// //TEACHER'S SOLUTION:
+// // printGoals(...game.scored);
+
+// //7. The team with the lower odd is more likely to win. Print to the console which team is more likely to win, WITHOUT using an if else statement or the ternary operator
+
+// //no fucking idea how to tackle this one without using if/else or ternary....
+// //TEACHER'S SOLUTION:
+// team1 < team2 && console.log('Team 1 is more likely to win');
+
+//7. Was solved by providing the logic for a less than equation then using the && Operator to check for a truthy statement, to subsequently execute the console.log statement
+//fuck me life is hard when you're dumb :<
+
+//=====================================================
+//Looping Arrays: for-of loop
+//=====================================================
+
+//I can use the for of loop to loop through an aray like this:
+//It's a nicer, cleaner way of looping through an array without the usual i=0, i++ etc..
+const menuu = [...restaurant.starterMenu, ...restaurant.mainMenu];
+
+for (const item of menuu) console.log(item);
+
+//But what if I want the index values??
+//I can pass the .entries method to my menuu array, which will then output the index values to the console in an even neater way
+// for (const item of menuu.entries()) {
+//   console.log(`${item[0] + 1}: ${item[1]}`);
+// }
+
+//but now since item is an array, I can destructure it, to make my code even neater & better looking
+
+for (const [i, el] of menuu.entries()) {
+  console.log(`${i + 1}: ${el}`);
+}
+
+//=========================================
+//Looping over Objects
+//=========================================
+
+//Property NAMES:
+
+//Here I use a for loop to check for, and output to the console, the presence of key within my openingHours object, using the Object.keys method
+for (const day of Object.keys(openingHours)) console.log(day);
+
+//Here I use the Object.keys method to log the properties of the key values within my openingHours object, so it returns an array with my 3 property names, and their respective values
+const properties = Object.keys(openingHours);
+console.log(properties);
+
+//Because I stored the results of my Object.keys method inside a variable called properties, I can use an object literal to inform how many days we are open, so that the result always remains dynamic, and subject to change if need be
+//I also assign it to a variable called openStr, and I use that variable in my for of loop, nested inside another template literal to achieve the desired result
+let openStr = `We are open on ${properties.length} days: `;
+for (const day of properties) {
+  openStr += `${day}, `;
+}
+console.log(openStr);
+
+//Property VALUES:
+
+//Here I use the Object.values method to return only the values within my openingHours object
+const values = Object.values(openingHours);
+console.log(values);
+
+//If I want BOTH values AND names, I would use the Object.entries method, instead!
+const entries = Object.entries(openingHours);
+// console.log(entries);
+
+//and I can use the entries method to loop over the object!
+//So I create a for of loop, and another variable, "x", and tell the loop to go over the entries variable that holds both the key values and key names, and subsequently store them within the "x" variable
+//Then I use a template literal to dynamically output all of this to the console so it's displayed neatly, and can be subject to change if any of the key values and/or names within my openingHours object change
+//So the object literals are reading the results from the entries method
+//But, since we're working with an object, we can immediately destructure the for loop to get exactly what we need by specifying the exact property names I want
+
+// for (const x of entries)
+for (const [day, { open, close }] of entries) {
+  console.log(`On ${day} we open at ${open} and close at ${close}`);
+}
+
+// CHALLENGE 2
+
+('use strict');
+
 const game = {
   team1: 'Bayern Munich',
   team2: 'Borussia Dortmund',
@@ -424,75 +669,70 @@ const game = {
   },
 };
 
-//1. Create one player array for each team (variables 'players1', and 'players2')
+//1. Loop over the game.scored array and print each player name to the console, along with the goal number (example: "Goal 1: Lewandowski")
 
-const players1 = [game.players[0]];
-const players2 = [game.players[1]];
-console.log(
-  '1. Array containing all the players for each respective team',
-  players1,
-  players2
-);
+//created a for of loop, used the entries method to get the key value AND their property
+//Printed to the console using template literals for desired result
+for (let [goalScored, players] of game.scored.entries())
+  console.log(`Goal ${goalScored + 1}: ${players}`);
+
 //TEACHER'S SOLUTION:
-// const [players1, players2] = game.players;
-// console.log(players1, players2);
+// for (const [i, player] of game.scored.entries())
+//   console.log(`Goal ${i + 1}: ${player}`);
 
-//2. The first player in any player array is the goalkeeper and the others are field players. For Bayern Munich (team1) create one variable ('gk') with the goalkeeper's name, and one array ('fieldPlayers') with all the remaining 10 field players
+//2. Use a (for) loop to calculate the average odd and log it to the console
 
-const gk = [game.team1, ...players1];
-console.log(
-  '2. Array named gk containing Bayern as the goalkeeper and his players',
-  gk
-);
-//TEACHER'S SOLUTION:
-// const [gk, ...fieldPlayers] = players1;
+//Created two variables, sum and average, both equal to 0
+//created a for loop to loop through my game.odds object and take only the VALUES from it, then assign the result to a variable called "odds"
+//Then I create some maths logic nested within it that states the variable sum should be equal to the SUM TOTAL value of the key values within odds, divided by 3, and rounded to the third decimal place
 
-//3. Create an array 'allPlayers', containing all players of both teams (22 players)
+let sum = 0;
+let average = 0;
 
-const allPlayers = [...players1, ...players2];
-console.log('3. Array containing all Players', allPlayers);
-//I got the code, and the syntax, correct, BUT because I fucked up the first two questions, it ends up fucking up this question, too, and I end up with 2 seperate arrays of 1 each....
-
-//4. During the game, Bayern Munich (team 1) used 3 substitute players. So create a new array ('playersFinal') containing all the original team 1 players, plus 'Thiago', 'Coutinho', and 'Perisic'
-
-const playersFinal = [...players1, 'Thiago', 'Coutinho', 'Perisic'];
-console.log(
-  "4. New array containing all of team 1's players + the new ones",
-  playersFinal
-);
-//THIS is the only one you got right, you dickhead
-
-//5. Based on the game.odds object, create one variable for each odd (called 'team1', draw, and 'team2')
-
-const {
-  odds: { team1, x: draw, team2 },
-} = game;
-console.log('5. New variable names destructured', team1, draw, team2);
-//YOU GOT THIS ONE RIGHT AS WELL; MIRACLE
-
-//6. Write a function ('printGoals') that receives an arbitrary number of player names (NOT AN ARRAY) and prints each of them to the console, along with the number of goals that were scored (number of player names passed in)
-//TEST DATA FOR 6:
-//'Davies', 'Muller', 'Lewandowski', 'Kimmich'
-
-function printGoals(...playerNames) {
-  console.log(`${playerNames.length} goals scored`);
-  for (let i = 0; i < playerNames.length; i++) {
-    console.log(playerNames[i]);
-  }
+for (let odds of Object.values(game.odds)) {
+  average = (sum += odds / 3).toFixed(3);
+  // (11.08 / 3) = 3.69333.. RPT. - rounded to third decimal place with toFixed(3)
 }
-console.log(
-  '6. Function that prints out the names of the 4 goal scorers and informs how many total goals were scored'
-);
-printGoals('Davies', 'Muller', 'Lewandowski', 'Kimmich');
-//You got your code right, but you didn't call the function correctly (like usual...)
+console.log(`The mean of the odds is equal to ${average}`);
+
 //TEACHER'S SOLUTION:
-// printGoals(...game.scored);
+// const odds = Object.values(game.odds);
+// let average = 0;
+// for (const odd of odds) average += odd;
+// average /= odds.length;
+// console.log(average);
 
-//7. The team with the lower odd is more likely to win. Print to the console which team is more likely to win, WITHOUT using an if else statement or the ternary operator
+//3. Print the 3 odds to the console, but in a nice, NEAT, and formatted way, like we just did before in the theory section. Exactly like this:
+//Odds of victory: Bayern Munich: 1.33
+//Odds of draw: 3.25
+//Odds of victory Borussia Dortmund: 6.5
+//Get the team names directly from the game object, DON'T hardcode them (except for "draw"). HINT: Note how the odds and the game objects have the same property names!!
 
-//no fucking idea how to tackle this one without using if/else or ternary....
+//Created a for loop that iterates over my game.odds object and returns both the object name and object variable
+//created two variables, victoryName & victoryOdds, with victoryNAme being equal to the object value name, and victoryOdds being equal to the object key value
+//Created a bodgy if/else block to get around "undefined" being printed to the console because there are only two valid values in victoryName, but three in victoryOdds
+
+for (const [victoryName, victoryOdds] of Object.entries(game.odds))
+  if (victoryName === 'x') {
+    console.log(`Odds of draw: ${[victoryOdds]}`);
+  } else {
+    console.log(`Odds of victory: ${game[victoryName]}: ${[victoryOdds]}`);
+  }
+
 //TEACHER'S SOLUTION:
-team1 < team2 && console.log('Team 1 is more likely to win');
+for (const [team, odd] of Object.entries(game.odds)) {
+  const teamStr = team === 'x' ? 'draw' : `victory${game[team]}`;
+  console.log(`Odd of ${teamStr}, ${odd}`);
+}
+//BONUS: Create an object called 'scorers' which contains the names of the players who scored as properties, and the number of goals are the value. In this game, it will look like this:
+// {
+//   Gnarby: 1,
+//   Hummels: 1,
+//   Lewandowski: 2
+//   }
 
-//7. Was solved by providing the logic for a less than equation then using the && Operator to check for a truthy statement, to subsequently execute the console.log statement
-//fuck me life is hard when you're dumb :<
+const scorers = {
+  Gnarby: 1,
+  Hummels: 1,
+  Lewandowski: 2,
+};
